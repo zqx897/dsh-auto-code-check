@@ -1,0 +1,52 @@
+{
+  "name": "dsh-auto-code-check",
+  "description": "Multi-language auto code review plugin for DeepSeek Harness — runs tsc, clang-tidy, cppcheck, ruff, mypy on edit/write and reports diagnostics.",
+  "version": "0.1.0",
+  "type": "module",
+  "main": "src/index.ts",
+  "types": "src/index.ts",
+  "exports": {
+    ".": {
+      "types": "./src/index.ts",
+      "default": "./src/index.ts"
+    },
+    "./src/*": "./src/*",
+    "./package.json": "./package.json"
+  },
+  "files": [
+    "src/index.ts",
+    "src/**/*.ts",
+    "cordis.patch.yml"
+  ],
+  "license": "MIT",
+  "scripts": {
+    "typecheck": "tsc --noEmit",
+    "build": "tsc",
+    "prepare": "tsc",
+    "test": "node --test src/*.test.ts"
+  },
+  "dsh": {
+    "bundle": {
+      "patch": "./cordis.patch.yml"
+    }
+  },
+  "peerDependencies": {
+    "@deepseek-ai/dsh-tools": "workspace:^",
+    "@deepseek-ai/dsh-agent": "workspace:^",
+    "@deepseek-ai/dsh-llm": "workspace:^",
+    "@deepseek-ai/dsh-subprocess": "workspace:^",
+    "@deepseek-ai/cordis": "workspace:^"
+  },
+  "dependencies": {
+    "@deepseek-ai/schemastery": "workspace:^"
+  },
+  "devDependencies": {
+    "@deepseek-ai/dsh-tools": "workspace:^",
+    "@deepseek-ai/dsh-agent": "workspace:^",
+    "@deepseek-ai/dsh-llm": "workspace:^",
+    "@deepseek-ai/dsh-subprocess": "workspace:^",
+    "@deepseek-ai/cordis": "workspace:^",
+    "@types/node": "^22.0.0",
+    "typescript": "^5.6.0"
+  }
+}

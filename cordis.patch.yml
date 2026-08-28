@@ -1,0 +1,10 @@
+# Bundle patch for dsh-auto-code-check.
+# Applied when a profile lists this bundle in its dsh.profile.bundles.
+#
+# The `name` field is the npm package name; DSH resolves it through Node
+# resolution and imports the package's main entry point (lib/index.js).
+# The `apply` export is the Cordis plugin function.
+
+- insert:
+    - id: auto-code-check
+      name: dsh-auto-code-check
