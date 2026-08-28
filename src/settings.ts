@@ -66,10 +66,18 @@ export const Config: z<Config> = z.object({
   debounceMs: z.number().default(800),
   triggerTools: z.array(z.string()).default(['edit', 'write']),
   maxDiagnostics: z.number().default(120),
-  typescript: LanguageSettings.default({}),
-  cpp: LanguageSettings.default({}),
-  python: LanguageSettings.default({}),
+  typescript: LanguageSettings,
+  cpp: LanguageSettings,
+  python: LanguageSettings,
 })
 
 /** Resolved config with all defaults filled in. */
-export const DEFAULT_CONFIG: Config = Config({})
+export const DEFAULT_CONFIG: Config = {
+  enabled: true,
+  debounceMs: 800,
+  triggerTools: ['edit', 'write'],
+  maxDiagnostics: 120,
+  typescript: { enabled: true, timeoutMs: 60_000, maxDiagnostics: 120, extraArgs: [] },
+  cpp: { enabled: true, timeoutMs: 60_000, maxDiagnostics: 120, extraArgs: [] },
+  python: { enabled: true, timeoutMs: 30_000, maxDiagnostics: 120, extraArgs: [] },
+}

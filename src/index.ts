@@ -9,8 +9,8 @@
  * @module dsh-auto-code-check
  */
 
+import './types/dsh-stubs.d.ts'
 import type { Context } from '@deepseek-ai/cordis'
-import z from '@deepseek-ai/schemastery'
 import { defineTool } from '@deepseek-ai/dsh-tools'
 import type { ToolExecution } from '@deepseek-ai/dsh-tools'
 import { join } from 'node:path'
@@ -84,22 +84,14 @@ interface CodeCheckArgs {
   path?: string
 }
 
-const codeCheckArgs = z.object({
-  run: z.boolean().default(false),
-  path: z.string().optional(),
-})
-
 // ---------------------------------------------------------------------------
 // Plugin entry
 // ---------------------------------------------------------------------------
 
-export function apply(ctx: Context, rawConfig: ConfigType = {}): void {
+export function apply(ctx: Context, rawConfig?: Partial<ConfigType>): void {
   const config: ConfigType = { ...DEFAULT_CONFIG, ...rawConfig }
-
-  // Start background runtime (subscribes to fs/observed)
   const stopRuntime = startRuntime(ctx, config)
 
-  // Register the code_check tool
   const disposeTool = ctx.tools.register(
     defineTool({
       name: 'code_check',
@@ -109,23 +101,15 @@ export function apply(ctx: Context, rawConfig: ConfigType = {}): void {
         'Without `run: true`, returns the latest cached report. ' +
         'With `run: true`, forces a fresh check on the current workspace.',
       parameters: {
-        run: {
-          type: 'boolean',
-          description: 'Force a fresh run instead of reading cache.',
-        },
-        path: {
-          type: 'string',
-          description: 'Filter by file path segment (exact match, e.g. "src/app.ts").',
-        },
+        run: { type: 'boolean', description: 'Force a fresh run instead of reading cache.' },
+        path: { type: 'string', description: 'Filter by file path segment (e.g. "src/app.ts").' },
       },
       output: {
         schema: { type: 'string' },
-        render: (_args, value) => [{ type: 'text', text: value }],
+        render: (_args: unknown, value: unknown) => [{ type: 'text', text: value as string }],
       },
-      async execute(args: CodeCheckArgs, exec: ToolExecution) {
-        const parsed = codeCheckArgs.parse(args ?? {})
-
-        // Determine the working directory
+      async execute(_args: CodeCheckArgs, exec: ToolExecution) {
+        const parsed = (_args ?? {}) as CodeCheckArgs
         const cwd = exec.agent?.session.header.cwd ?? process.cwd()
 
         if (parsed.run) {
@@ -174,10 +158,10 @@ export function apply(ctx: Context, rawConfig: ConfigType = {}): void {
     }),
   )
 
-  // Return disposer for cleanup
-  return () => {
+  // Cleanup on dispose
+  ctx.on('dispose', () => {
     stopRuntime()
     disposeTool()
     clearCache()
-  }
+  })
 }

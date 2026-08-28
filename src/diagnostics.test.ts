@@ -18,8 +18,8 @@ src/app.ts(40,1): error TS2304: Cannot find name 'foo'`
   // The parser should extract 2 diagnostics
   const lines = output.split('\n')
   assert.equal(lines.length, 2)
-  assert.ok(lines[0].includes('TS2345'))
-  assert.ok(lines[1].includes('TS2304'))
+  assert.ok(lines[0]!.includes('TS2345'))
+  assert.ok(lines[1]!.includes('TS2304'))
 })
 
 test('clang-tidy output format is parseable', () => {
@@ -28,8 +28,8 @@ src/main.cpp:15:1: error: something [clang-diagnostic-error]`
 
   const lines = output.split('\n')
   assert.equal(lines.length, 2)
-  assert.ok(lines[0].includes('modernize-use-auto'))
-  assert.ok(lines[1].includes('clang-diagnostic-error'))
+  assert.ok(lines[0]!.includes('modernize-use-auto'))
+  assert.ok(lines[1]!.includes('clang-diagnostic-error'))
 })
 
 test('ruff output format is parseable', () => {
@@ -38,8 +38,8 @@ src/app.py:20:1: E501 Line too long ( > 88 characters)`
 
   const lines = output.split('\n')
   assert.equal(lines.length, 2)
-  assert.ok(lines[0].includes('F401'))
-  assert.ok(lines[1].includes('E501'))
+  assert.ok(lines[0]!.includes('F401'))
+  assert.ok(lines[1]!.includes('E501'))
 })
 
 test('mypy output format is parseable', () => {
@@ -48,8 +48,8 @@ src/app.py:20: note: Something worth mentioning`
 
   const lines = output.split('\n')
   assert.equal(lines.length, 2)
-  assert.ok(lines[0].includes('error'))
-  assert.ok(lines[1].includes('note'))
+  assert.ok(lines[0]!.includes('error'))
+  assert.ok(lines[1]!.includes('note'))
 })
 
 test('cppcheck output format is parseable', () => {

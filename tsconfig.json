@@ -20,7 +20,7 @@
     "noUnusedParameters": true,
     "types": ["node"],
     "rootDir": "src",
-    "outDir": "lib/types",
+    "outDir": "lib",
     "lib": ["es2024"]
   },
   "include": ["src/**/*"],

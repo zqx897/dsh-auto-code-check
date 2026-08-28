@@ -9,6 +9,7 @@
  * so we only need to clean up timers and the tool registration.
  */
 
+import './types/dsh-stubs.d.ts'
 import type { Context } from '@deepseek-ai/cordis'
 import type { FsObservation, FsTarget } from '@deepseek-ai/dsh-fs'
 import { dirname, resolve } from 'node:path'
@@ -112,9 +113,11 @@ export function clearCache(): void {
 export function startRuntime(ctx: Context, config: Config): () => void {
   if (!config.enabled) return () => {}
 
-  const handler = (target: FsTarget, observation: FsObservation) => {
-    if (observation.kind !== 'present') return
-    scheduleCheck(target.displayPath, config)
+  const handler = (target: unknown, observation: unknown) => {
+    const t = target as FsTarget
+    const o = observation as FsObservation
+    if (o.kind !== 'present') return
+    scheduleCheck(t.displayPath, config)
   }
 
   ctx.on('fs/observed', handler)

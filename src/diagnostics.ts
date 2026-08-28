@@ -26,7 +26,12 @@ function parseTscOutput(output: string): Diagnostic[] {
   const re = /^(.+?)\((\d+),(\d+)\):\s*(error|warning)\s+(\S+):\s*(.+)$/gm
   let match: RegExpExecArray | null
   while ((match = re.exec(output)) !== null) {
-    const [, file, line, col, severity, code, message] = match
+    const file = match[1]!
+    const line = match[2]!
+    const col = match[3]!
+    const severity = match[4]!
+    const code = match[5]!
+    const message = match[6]!
     diagnostics.push({
       file: resolve(file),
       line: parseInt(line, 10),
@@ -47,17 +52,21 @@ function parseTscOutput(output: string): Diagnostic[] {
  */
 function parseClangTidyOutput(output: string): Diagnostic[] {
   const diagnostics: Diagnostic[] = []
-  // Match: path:line:col: severity: message [code]
   const re = /^(.+?):(\d+):(\d+):\s*(error|warning|note|remark)\s*:\s*(.+?)(?:\s*\[(.+)\])?$/gm
   let match: RegExpExecArray | null
   while ((match = re.exec(output)) !== null) {
-    const [, file, line, col, severity, message, code] = match
+    const file = match[1]!
+    const line = match[2]!
+    const col = match[3]!
+    const severity = match[4]!
+    const message = match[5]!
+    const code = match[6] ?? 'clang-diagnostic'
     diagnostics.push({
       file: resolve(file),
       line: parseInt(line, 10),
       column: parseInt(col, 10),
       severity: severity === 'error' ? 'error' : 'warning',
-      code: code ?? 'clang-diagnostic',
+      code,
       message: message.trim(),
       source: 'clang-tidy',
     })
@@ -76,7 +85,12 @@ function parseCppcheckOutput(output: string): Diagnostic[] {
   const re1 = /^(.+?):(\d+):(\d+):\s*(error|warning|information|style)\s*:\s*(.+?)(?:\s*\[(.+)\])?$/gm
   let match: RegExpExecArray | null
   while ((match = re1.exec(output)) !== null) {
-    const [, file, line, col, severity, message, code] = match
+    const file = match[1]!
+    const line = match[2]!
+    const col = match[3]!
+    const severity = match[4]!
+    const message = match[5]!
+    const code = match[6] ?? 'cppcheck'
     diagnostics.push({
       file: resolve(file),
       line: parseInt(line, 10),
@@ -92,7 +106,10 @@ function parseCppcheckOutput(output: string): Diagnostic[] {
   // Format 2: [path:line]: (severity) message
   const re2 = /^\[(.+?):(\d+)\]:\s*\((error|warning|info)\)\s*(.+)$/gm
   while ((match = re2.exec(output)) !== null) {
-    const [, file, line, severity, message] = match
+    const file = match[1]!
+    const line = match[2]!
+    const severity = match[3]!
+    const message = match[4]!
     diagnostics.push({
       file: resolve(file),
       line: parseInt(line, 10),
@@ -117,7 +134,11 @@ function parseRuffOutput(output: string): Diagnostic[] {
   const re = /^(.+?):(\d+):(\d+)\s+([A-Z]\d+)\s+(.+)$/gm
   let match: RegExpExecArray | null
   while ((match = re.exec(output)) !== null) {
-    const [, file, line, col, code, message] = match
+    const file = match[1]!
+    const line = match[2]!
+    const col = match[3]!
+    const code = match[4]!
+    const message = match[5]!
     diagnostics.push({
       file: resolve(file),
       line: parseInt(line, 10),
@@ -142,7 +163,10 @@ function parseMypyOutput(output: string): Diagnostic[] {
   const re = /^(.+?):(\d+):\s*(error|warning|note)\s*:\s*(.+)$/gm
   let match: RegExpExecArray | null
   while ((match = re.exec(output)) !== null) {
-    const [, file, line, severity, message] = match
+    const file = match[1]!
+    const line = match[2]!
+    const severity = match[3]!
+    const message = match[4]!
     diagnostics.push({
       file: resolve(file),
       line: parseInt(line, 10),
@@ -276,7 +300,7 @@ export async function runTool(
       }
     })
 
-    proc.on('close', (code) => {
+    proc.on('close', (_code) => {
       // tsc returns non-zero when errors are found — that's expected.
       // clang-tidy returns 0 even with warnings.
       const parser = PARSERS[tool.name]
